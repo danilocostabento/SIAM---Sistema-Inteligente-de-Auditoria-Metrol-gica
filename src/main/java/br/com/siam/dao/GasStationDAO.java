@@ -13,6 +13,8 @@ public interface GasStationDAO {
 
     Optional<GasStation> findById(Integer id);
 
+    Optional<GasStation> findByCnpj(String cnpj);
+
     List<GasStation> search(String term);
 
     boolean update(GasStation gasStation);

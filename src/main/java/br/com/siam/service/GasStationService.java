@@ -3,6 +3,7 @@ package br.com.siam.service;
 import br.com.siam.dao.GasStationDAO;
 import br.com.siam.dao.impl.GasStationDAOImpl;
 import br.com.siam.model.GasStation;
+import br.com.siam.util.CnpjValidator;
 
 import java.util.List;
 import java.util.Optional;
@@ -40,6 +41,16 @@ public class GasStationService {
                 );
     }
 
+    public GasStation getByCnpj(
+            String Cnpj
+    ) {
+        return gasStationDAO.findByCnpj(Cnpj).orElseThrow(
+                () -> new RuntimeException(
+                        "Posto não encontrado."
+                )
+        );
+    }
+
     public List<GasStation> searchGasStations(String term) {
 
         return gasStationDAO.search(term);
@@ -70,11 +81,31 @@ public class GasStationService {
                     "Endereço é obrigatório."
             );
         }
+
+        if (!CnpjValidator.isValid(
+                gasStation.getCnpj()
+        )) {
+            throw new IllegalArgumentException(
+                    "CNPJ inválido"
+            );
+        }
+
+        Optional<GasStation> existingStation = gasStationDAO.findByCnpj(
+                gasStation.getCnpj()
+        );
+
+        if (existingStation.isPresent()) {
+            throw new IllegalArgumentException(
+                    "Já existe um posto cadastrado com este CNPJ."
+            );
+        }
     }
 
     public boolean update(
             GasStation gasStation
     ) {
+
+        validateGasStation(gasStation);
 
         return gasStationDAO.update(
                 gasStation

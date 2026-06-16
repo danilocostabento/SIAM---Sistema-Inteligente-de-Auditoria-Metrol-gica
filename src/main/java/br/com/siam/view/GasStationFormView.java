@@ -1,13 +1,19 @@
 package br.com.siam.view;
 
 import br.com.siam.controller.GasStationController;
+import br.com.siam.dto.CompanyDataDTO;
+import br.com.siam.integration.CnpjJaClient;
+import br.com.siam.integration.CompanyLookupClient;
 import br.com.siam.model.GasStation;
 import br.com.siam.model.User;
 import br.com.siam.util.IconUtils;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.MaskFormatter;
 import java.awt.*;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
@@ -18,10 +24,13 @@ public class GasStationFormView extends JFrame {
 
     private final GasStationController gasStationController;
 
+    private final CompanyLookupClient companyLookupClient =
+            new CnpjJaClient();
+
     /*
      * Form Components
      */
-    private JTextField cnpjField;
+    private JFormattedTextField cnpjField;
 
     private JTextField corporateNameField;
 
@@ -36,12 +45,37 @@ public class GasStationFormView extends JFrame {
 
     private JButton searchButton;
 
+    private JButton searchCnpjButton;
+
     /*
      * Table Components
      */
     private JTable gasStationTable;
 
     private DefaultTableModel gasStationTableModel;
+
+    private JFormattedTextField createCnpjField() {
+
+        try {
+
+            MaskFormatter maskFormatter =
+                    new MaskFormatter(
+                            "##.###.###/####-##"
+                    );
+
+            maskFormatter.setPlaceholderCharacter('_');
+
+            return new JFormattedTextField(
+                    maskFormatter
+            );
+
+        } catch (Exception exception) {
+
+            throw new RuntimeException(
+                    exception
+            );
+        }
+    }
 
     public GasStationFormView(User authenticatedUser) {
 
@@ -63,7 +97,7 @@ public class GasStationFormView extends JFrame {
 
     private void initializeComponents() {
 
-        cnpjField = new JTextField(20);
+        cnpjField = createCnpjField();
 
         corporateNameField = new JTextField(25);
 
@@ -74,6 +108,8 @@ public class GasStationFormView extends JFrame {
         searchField = new JTextField(20);
 
         searchButton = new JButton("Buscar");
+
+        searchCnpjButton = new JButton("Consultar CNPJ");
 
         String[] columns = {
                 "ID",
@@ -126,6 +162,21 @@ public class GasStationFormView extends JFrame {
         JPanel formPanel =
                 new JPanel(new GridLayout(4, 2, 10, 10));
 
+        JPanel cnpjPanel =
+                new JPanel(
+                        new BorderLayout(5, 0)
+                );
+
+        cnpjPanel.add(
+                cnpjField,
+                BorderLayout.CENTER
+        );
+
+        cnpjPanel.add(
+                searchCnpjButton,
+                BorderLayout.EAST
+        );
+
         formPanel.setBorder(
                 BorderFactory.createTitledBorder(
                         "Novo Posto"
@@ -133,7 +184,7 @@ public class GasStationFormView extends JFrame {
         );
 
         formPanel.add(new JLabel("CNPJ:"));
-        formPanel.add(cnpjField);
+        formPanel.add(cnpjPanel);
 
         formPanel.add(new JLabel("Razão Social:"));
         formPanel.add(corporateNameField);
@@ -207,6 +258,23 @@ public class GasStationFormView extends JFrame {
                     }
                 }
         );
+
+        searchCnpjButton.addActionListener(event -> {
+            lookupCompany();
+        });
+
+        cnpjField.addFocusListener(
+                new FocusAdapter() {
+
+                    @Override
+                    public void focusLost(
+                            FocusEvent event
+                    ) {
+
+                        lookupCompany();
+                    }
+                }
+        );
     }
 
     private void openGasStationDetails() {
@@ -241,7 +309,10 @@ public class GasStationFormView extends JFrame {
         try {
 
             gasStationController.createGasStation(
-                    cnpjField.getText().trim(),
+                    cnpjField.getText()
+                            .replace(".","")
+                            .replace("/","")
+                            .replace("-",""),
                     corporateNameField.getText().trim(),
                     addressField.getText().trim()
             );
@@ -254,6 +325,39 @@ public class GasStationFormView extends JFrame {
             clearForm();
 
             loadGasStations();
+
+        } catch (Exception exception) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    exception.getMessage(),
+                    "Erro",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
+    }
+
+    private void lookupCompany() {
+
+        try {
+
+            String cnpj =
+                    cnpjField.getText()
+                            .replace(".", "")
+                            .replace("/", "")
+                            .replace("-", "");
+
+            CompanyDataDTO companyData =
+                    companyLookupClient
+                            .findByCnpj(cnpj);
+
+            corporateNameField.setText(
+                    companyData.getCompanyName()
+            );
+
+            addressField.setText(
+                    companyData.getAddress()
+            );
 
         } catch (Exception exception) {
 

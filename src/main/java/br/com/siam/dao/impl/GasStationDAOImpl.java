@@ -163,6 +163,46 @@ public class GasStationDAOImpl implements GasStationDAO {
     }
 
     @Override
+    public Optional<GasStation> findByCnpj(String cnpj) {
+
+        String sql = """
+                SELECT *
+                FROM gas_station
+                WHERE cnpj = ?
+                """;
+
+        try (
+                Connection connection =
+                        DatabaseConnection.getConnection();
+
+                PreparedStatement preparedStatement =
+                        connection.prepareStatement(sql)
+        ) {
+
+            preparedStatement.setString(1, cnpj);
+
+            try (
+                    ResultSet resultSet =
+                            preparedStatement.executeQuery()
+            ) {
+
+                if (resultSet.next()) {
+
+                    return Optional.of(
+                            mapResult(resultSet)
+                    );
+                }
+            }
+
+        } catch (SQLException exception) {
+
+            exception.printStackTrace();
+        }
+
+        return Optional.empty();
+    }
+
+    @Override
     public List<GasStation> search(String term) {
 
         List<GasStation> gasStations =
