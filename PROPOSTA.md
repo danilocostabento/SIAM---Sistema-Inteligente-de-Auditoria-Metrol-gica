@@ -1,266 +1,67 @@
-# 📄 Proposta de Projeto — A3
+# Proposta de Projeto — SIAM
 
-## SIAM - Sistema Inteligente de Auditoria Metrológica
+## 1. Identificação
 
----
+- **Projeto:** SIAM — Sistema Inteligente de Auditoria Metrológica
+- **Curso:** Engenharia da Computação
+- **Disciplina:** Programação de Soluções Computacionais
+- **Semestre:** 2026/1
+- **Instituição:** Universidade São Judas Tadeu
+- **Professores:** Cristiane Fidelix e Erica Lopes
+- **Equipe:** Danilo Costa Bento, Letícia de Lima Silva, Leonardo Lopes Correia, José Victor Contierro e Renan dos Santos Souza
 
-## 👨‍🎓 Informações do Projeto
+## 2. Problema e justificativa
 
-* **Alunos:**
-  - Danilo Costa Bento
-  - Letícia de Lima Silva
-  - Leonardo Lopes Correia
-  - José Victor Contierro
-  - Renan dos Santos Souza
-* **Curso:** Engenharia da Computação
-* **Instituição:** Universidade São Judas Tadeu
-* **Disciplina:** Programação de Soluções Computacionais
-* **Semestre:** 2026/1
-* **Professores:** Cristiane Fidelix e Erica Lopes
+Fiscalizações metrológicas exigem registros confiáveis, consulta a históricos e comprovação das ocorrências. Processos manuais ou fragmentados dificultam a rastreabilidade, aumentam retrabalho e tornam a análise de reincidência mais lenta.
 
----
+O SIAM organiza essas informações em uma plataforma única. A evolução proposta preserva o desktop existente, centraliza os dados em uma API e permite coleta em campo por um aplicativo Kotlin, inclusive com evidências fotográficas enviadas por API.
 
-## 🌍 Alinhamento com ODS
+## 3. Objetivo geral
 
-Este projeto está alinhado aos seguintes Objetivos de Desenvolvimento Sustentável:
+Evoluir o MVP desktop para uma plataforma de apoio à fiscalização metrológica, com dados online, evidências rastreáveis, indicadores operacionais e futura mobilidade.
 
-- ⚖️ **ODS 16 — Paz, Justiça e Instituições Eficazes**
-- 🏗️ **ODS 9 — Indústria, Inovação e Infraestrutura**
+## 4. Objetivos específicos
 
-**Justificativa:**
+1. Consolidar requisitos funcionais, não funcionais e regras de negócio.
+2. Preservar os módulos já implementados e documentar seus limites.
+3. Projetar uma API REST com autenticação, autorização e validação.
+4. Migrar a persistência para banco online relacional quando a API estiver pronta.
+5. Armazenar imagens em object storage gratuito ou de baixo custo, sem colocar binários no banco.
+6. Desenvolver um aplicativo Kotlin para consultas e registros em campo.
+7. Criar indicadores de volume, status, irregularidades e reincidência.
+8. Avaliar IA/RAG como apoio, sempre com revisão e registro da fonte.
 
-O sistema contribui para o fortalecimento de instituições reguladoras (ODS 16), ao mesmo tempo em que promove inovação tecnológica e modernização de processos industriais e de fiscalização (ODS 9), por meio do uso de Inteligência Artificial e digitalização de operações.
+## 5. Escopo
 
----
+**Incluído:** usuários e perfis, postos, bombas, fiscalizações, irregularidades, evidências, histórico, dashboard, API, análise de dados e protótipo mobile.
 
-## 🧠 1. Resumo do Projeto
+**Fora do primeiro incremento:** decisão automática de autuação, publicação de normas sem validação, integração com sistemas governamentais e operação offline completa. Esses itens dependem de validação jurídica, técnica e acadêmica.
 
-O SIAM é um sistema desktop desenvolvido em Java com o objetivo de otimizar o processo de fiscalização de bombas medidoras de combustíveis.
+## 6. Metodologia e entregas
 
-A solução digitaliza:
+O desenvolvimento será incremental: levantamento, modelagem, API, migração controlada, evidências, analytics, mobile e testes. Cada etapa deve ter critérios de aceite, demonstração e registro no GitHub.
 
-* Registro de autuações
-* Armazenamento de evidências fotográficas
-* Apoio à tomada de decisão
+Entregáveis:
 
-O diferencial do sistema é a integração com **Inteligência Artificial Generativa**, utilizando arquitetura **RAG (Retrieval-Augmented Generation)** para auxiliar fiscais com base em normas técnicas reais.
+- sistema desktop preservado e documentado;
+- especificação de requisitos e casos de uso;
+- modelo de dados e análise de indicadores;
+- API REST documentada;
+- banco online e storage configurados sem credenciais no código;
+- protótipo ou versão inicial Android em Kotlin;
+- testes, vídeo demonstrativo e apresentação.
 
----
+## 7. Critérios de sucesso
 
-## 🚧 2. Justificativa e Motivação
+- usuários autenticados acessam somente operações autorizadas;
+- cada fiscalização possui autoria, data, status e histórico;
+- imagens são enviadas por API e vinculadas por metadados;
+- indicadores podem ser filtrados por período, local e irregularidade;
+- desktop e mobile consomem contratos consistentes;
+- documentação permite reproduzir o ambiente sem expor segredos.
 
-A fiscalização metrológica enfrenta desafios como:
+## 8. Alinhamento com ODS
 
-* Fraudes cada vez mais sofisticadas
-* Grande volume de normas técnicas
-* Alto risco de erros administrativos
-
-O SIAM atua como um **assistente especialista**, reduzindo erros humanos, aumentando a eficiência e garantindo conformidade legal.
-
----
-
-## 🎯 3. Objetivos
-
-### 🎯 Objetivo Geral
-
-Desenvolver uma aplicação desktop capaz de gerenciar fiscalizações e utilizar IA para gerar planos de ação automatizados com base em documentação técnica.
-
----
-
-### 📌 Objetivos Específicos
-
-* Implementar autenticação e controle de acesso
-* Desenvolver interface gráfica intuitiva
-* Criar banco de dados relacional
-* Armazenar evidências fotográficas
-* Construir base de conhecimento técnica
-* Integrar com API de IA (Google Gemini)
-* Implementar arquitetura RAG
-
----
-
-## 🏗️ 4. Arquitetura do Sistema
-
-O sistema seguirá o padrão:
-
-### 🧩 Arquitetura
-
-* **MVC (Model-View-Controller)**
-
-### 💻 Tecnologias
-
-* **Linguagem:** Java (JDK 17+)
-* **Interface Gráfica:** `javax.swing`
-* **Banco de Dados:** MySQL
-* **Persistência:** JDBC + DAO
-* **IA:** API Google Gemini
-* **Concorrência:** Threads
-
----
-
-## 🗄️ 5. Modelagem de Dados
-
-Principais entidades:
-
-* **Usuário**
-* **Proprietário**
-* **Fiscalização**
-* **Foto de Evidência**
-* **Base de Conhecimento Técnica**
-* **Microtarefas (IA)**
-
-```mermaid
-erDiagram
-
-    USERS {
-        int id PK
-        string name
-        string login
-        string registration
-        string password_hash
-        string user_type "ADMIN or INSPECTOR"
-    }
-
-    GAS_STATION {
-        int id PK
-        string cnpj
-        string corporate_name
-        string address
-    }
-
-    GAS_PUMP {
-        int id PK
-        int gas_station_id FK
-        string serial_number
-        string model
-    }
-
-    FISCALIZATION {
-        int id PK
-        int user_id FK
-        int gas_pump_id FK
-        datetime fiscalization_date
-        string irregularity_type
-        decimal measurement_error
-        string audit_status
-    }
-
-    PHOTO_EVIDENCE {
-        int id PK
-        int fiscalization_id FK
-        string file_path
-        string description
-    }
-
-    NEXT_STEP {
-        int id PK
-        int fiscalization_id FK
-        string action_description
-        boolean concluded
-    }
-
-    USERS ||--o{ FISCALIZATION : performs
-    GAS_STATION ||--o{ GAS_PUMP : has
-    GAS_PUMP ||--o{ FISCALIZATION : is_inspected_in
-    FISCALIZATION ||--o{ PHOTO_EVIDENCE : has
-    FISCALIZATION ||--o{ NEXT_STEP : generates
-```
-
-
----
-
-## 🤖 6. Metodologia de IA (RAG)
-
-O sistema utilizará a arquitetura RAG:
-
-1. **Recuperação:** busca dados técnicos no banco
-2. **Aumento:** combina dados com contexto da fiscalização
-3. **Geração:** IA gera checklist estruturado
-4. **Apresentação:** tarefas exibidas ao usuário
-
----
-
-## ⚙️ 7. Requisitos do Sistema
-
-### 🔐 Requisitos Funcionais
-
-* RF01: CRUD de fiscalizações e proprietários
-* RF02: Upload e visualização de fotos
-* RF03: Filtros de busca avançados
-* RF04: Gestão da base de conhecimento
-* RF05: Geração de tarefas via IA
-* RF06: Controle de acesso com autenticação
-* RF07: Dois níveis de usuário (Admin e comum)
-* RF08: Dashboard com métricas do sistema
-
----
-
-### ⚡ Requisitos Não Funcionais
-
-* RNF01: Aplicação desktop leve
-* RNF02: Tempo de resposta < 2s
-* RNF03: Senhas criptografadas
-* RNF04: Interface responsiva
-* RNF05: Sistema escalável e modular
-
----
-
-## 📊 8. Dashboard (Obrigatório pelo Edital)
-
-O sistema deverá apresentar:
-
-* Total de fiscalizações
-* Total de usuários
-* Casos por tipo de fraude
-* Reincidência por CNPJ
-
----
-
-## 🗓️ 9. Cronograma
-
-| Mês | Atividade                  |
-| --- | -------------------------- |
-| 1   | Levantamento de requisitos |
-| 2   | Modelagem do banco         |
-| 3   | Desenvolvimento backend    |
-| 4   | Interface gráfica          |
-| 5   | Integração com IA          |
-| 6   | Testes e ajustes finais    |
-
----
-
-## 📦 10. Entregáveis
-
-* Sistema funcional desktop
-* Banco de dados integrado
-* Código no GitHub
-* Vídeo demonstrativo
-* Apresentação na banca
-
----
-
-## ⚠️ 11. Observações Importantes
-
-* O sistema seguirá os requisitos do edital da UC
-* Deve conter:
-
-  * Autenticação
-  * 2 tipos de usuário
-  * 3 CRUDs mínimos
-  * Dashboard
-* Um usuário administrador será criado diretamente no banco
-
----
-
-## 🚀 12. Diferencial do Projeto
-
-* Uso de IA com base normativa real
-* Arquitetura RAG (nível acima do padrão da turma 👀)
-* Aplicação prática em fiscalização real
-* Alto potencial de impacto acadêmico e profissional
-
----
-
-## 📌 Status do Projeto
-
-🟡 Em fase de planejamento
+- **ODS 9:** inovação e infraestrutura digital.
+- **ODS 12:** apoio ao consumo e à produção responsáveis.
+- **ODS 16:** transparência, rastreabilidade e instituições eficazes.

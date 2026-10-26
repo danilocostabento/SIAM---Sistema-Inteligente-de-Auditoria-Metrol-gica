@@ -127,22 +127,28 @@ Funcionalidades:
 
 ---
 
-## ⚠️ Limitações da Sprint
-- senhas não criptografadas (uso temporário de texto simples)
-- ausência de controle de sessão
-- ausência de logs estruturados
-- UI ainda não refinada
-- ausência de tratamento global de excessões
+## ⚠️ Limitações registradas na Sprint
+
+Estas limitações descrevem o estado documentado da Sprint 1 e devem ser tratadas antes da exposição do sistema:
+
+- validar o uso efetivo de hash de senha no fluxo atual;
+- implementar controle de sessão e expiração;
+- adicionar logs estruturados sem registrar credenciais;
+- refinar a UI e o tratamento global de exceções;
+- preparar a camada de serviço para consumo por API.
 
 ---
 
-## 🚀 Preparação para Sprint 2
+## 🚀 Preparação para as próximas etapas
 
 A base permite:
 - criação da MainView
 - listagem de dados do banco
 - controle de acesso por tipo de usuário
-- expansão para novas entidades (Inspection, Posto, etc.)
+- expansão para novas entidades (Inspection, Posto, evidências e histórico);
+- levantamento formal em [requisitos](requisitos.md);
+- casos de uso em [casos de uso](casos-de-uso.md);
+- preparação para API, banco online e aplicativo Kotlin em [arquitetura](arquitetura-roadmap.md).
 
 ---
 
