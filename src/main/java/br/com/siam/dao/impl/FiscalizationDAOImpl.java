@@ -95,7 +95,7 @@ public class FiscalizationDAOImpl implements FiscalizationDAO {
                     gs.id AS station_id,
                     gs.corporate_name
                 FROM fiscalization f
-                INNER JOIN user u
+                INNER JOIN app_user u
                     ON u.id = f.user_id
                 INNER JOIN gas_pump gp
                     ON gp.id = f.gas_pump_id
@@ -145,7 +145,7 @@ public class FiscalizationDAOImpl implements FiscalizationDAO {
                     gs.id AS station_id,
                     gs.corporate_name
                 FROM fiscalization f
-                INNER JOIN user u
+                INNER JOIN app_user u
                     ON u.id = f.user_id
                 INNER JOIN gas_pump gp
                     ON gp.id = f.gas_pump_id
@@ -194,7 +194,7 @@ public class FiscalizationDAOImpl implements FiscalizationDAO {
                     gs.id AS station_id,
                     gs.corporate_name
                 FROM fiscalization f
-                INNER JOIN user u
+                INNER JOIN app_user u
                     ON u.id = f.user_id
                 INNER JOIN gas_pump gp
                     ON gp.id = f.gas_pump_id
@@ -249,7 +249,7 @@ public class FiscalizationDAOImpl implements FiscalizationDAO {
                     gs.id AS station_id,
                     gs.corporate_name
                 FROM fiscalization f
-                INNER JOIN user u
+                INNER JOIN app_user u
                     ON u.id = f.user_id
                 INNER JOIN gas_pump gp
                     ON gp.id = f.gas_pump_id
@@ -368,7 +368,7 @@ public class FiscalizationDAOImpl implements FiscalizationDAO {
              gs.id AS station_id,
              gs.corporate_name
          FROM fiscalization f
-         INNER JOIN user u
+         INNER JOIN app_user u
             ON u.id = f.user_id
          INNER JOIN gas_pump gp
              ON gp.id = f.gas_pump_id
