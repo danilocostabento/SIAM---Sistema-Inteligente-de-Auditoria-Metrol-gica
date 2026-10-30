@@ -64,6 +64,10 @@ public class MainView extends JFrame {
 
     private JScrollPane fiscalizationScrollPane;
 
+    private JLabel tableStatusLabel;
+
+    private SwingWorker<List<Fiscalization>, Void> fiscalizationLoadWorker;
+
     /*
      * Pagination Components
      */
@@ -212,6 +216,9 @@ public class MainView extends JFrame {
 
         fiscalizationScrollPane =
                 new JScrollPane(fiscalizationTable);
+
+        tableStatusLabel = new JLabel("Pronto para carregar fiscalizações.");
+        tableStatusLabel.setBorder(new EmptyBorder(6, 4, 0, 4));
 
         /*
          * Pagination
@@ -395,6 +402,8 @@ public class MainView extends JFrame {
                 BorderLayout.CENTER
         );
 
+        listingPanel.add(tableStatusLabel, BorderLayout.SOUTH);
+
         return listingPanel;
     }
 
@@ -444,31 +453,92 @@ public class MainView extends JFrame {
     }
 
     private void loadFiscalizations() {
+        loadFiscalizations(null);
+    }
+
+    private void loadFiscalizations(String searchTerm) {
+        if (fiscalizationLoadWorker != null && !fiscalizationLoadWorker.isDone()) {
+            fiscalizationLoadWorker.cancel(true);
+        }
 
         fiscalizationTableModel.setRowCount(0);
+        tableStatusLabel.setText("Carregando fiscalizações...");
+        searchButton.setEnabled(false);
+        onlyMyFiscalizationsCheckBox.setEnabled(false);
 
-        List<Fiscalization> fiscalizations;
+        boolean onlyMyFiscalizations = onlyMyFiscalizationsCheckBox.isSelected();
+        Integer userId = authenticatedUser.getId();
+        String normalizedSearchTerm =
+                searchTerm == null || searchTerm.isBlank()
+                        ? null
+                        : searchTerm.trim();
 
-        if (onlyMyFiscalizationsCheckBox.isSelected()) {
+        fiscalizationLoadWorker = new SwingWorker<>() {
+            @Override
+            protected List<Fiscalization> doInBackground() {
+                if (normalizedSearchTerm != null) {
+                    return fiscalizationService.search(normalizedSearchTerm);
+                }
 
-            fiscalizations =
-                    fiscalizationService
-                            .getUserFiscalizations(
-                                    authenticatedUser.getId()
-                            );
+                if (onlyMyFiscalizations) {
+                    return fiscalizationService.getUserFiscalizations(userId);
+                }
 
-        } else {
+                return fiscalizationService.getAllFiscalizations();
+            }
 
-            fiscalizations =
-                    fiscalizationService
-                            .getAllFiscalizations();
-        }
+            @Override
+            protected void done() {
+                searchButton.setEnabled(true);
+                onlyMyFiscalizationsCheckBox.setEnabled(true);
+
+                if (isCancelled()) {
+                    return;
+                }
+
+                try {
+                    List<Fiscalization> fiscalizations = get();
+                    renderFiscalizations(fiscalizations);
+
+                    if (fiscalizations.isEmpty()) {
+                        tableStatusLabel.setText(
+                                "Nenhuma fiscalização encontrada. Verifique os filtros e se existem registros no banco."
+                        );
+                    } else {
+                        tableStatusLabel.setText(
+                                fiscalizations.size() + " fiscalização(ões) carregada(s)."
+                        );
+                    }
+                } catch (InterruptedException exception) {
+                    Thread.currentThread().interrupt();
+                    tableStatusLabel.setText("Carregamento interrompido.");
+                } catch (java.util.concurrent.ExecutionException exception) {
+                    Throwable cause = exception.getCause() == null
+                            ? exception
+                            : exception.getCause();
+
+                    tableStatusLabel.setText("Não foi possível carregar as fiscalizações.");
+                    JOptionPane.showMessageDialog(
+                            MainView.this,
+                            "Falha ao carregar dados do banco de dados.\n"
+                                    + cause.getMessage(),
+                            "Erro de conexão ou consulta",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                }
+            }
+        };
+
+        fiscalizationLoadWorker.execute();
+    }
+
+    private void renderFiscalizations(List<Fiscalization> fiscalizations) {
+        fiscalizationTableModel.setRowCount(0);
 
         DateTimeFormatter formatter =
                 DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
         for (Fiscalization fiscalization : fiscalizations) {
-
             fiscalizationTableModel.addRow(
                     new Object[]{
                             fiscalization.getId(),
@@ -476,13 +546,13 @@ public class MainView extends JFrame {
                             fiscalization.getGasPump()
                                     .getGasStation()
                                     .getCorporateName(),
-                            fiscalization.getGasPump()
-                                    .getSerialNumber(),
+                            fiscalization.getGasPump().getSerialNumber(),
                             fiscalization.getIrregularityType(),
                             fiscalization.getAuditStatus(),
                             fiscalization.getMeasurementError(),
-                            fiscalization.getFiscalizationDate()
-                                    .format(formatter)
+                            fiscalization.getFiscalizationDate() == null
+                                    ? ""
+                                    : fiscalization.getFiscalizationDate().format(formatter)
                     }
             );
         }
@@ -560,9 +630,7 @@ public class MainView extends JFrame {
                         return;
                     }
 
-                    loadFiscalizationsBySearch(
-                            searchTerm
-                    );
+                    loadFiscalizationsBySearch(searchTerm);
                 });
 
         newFiscalizationButton
@@ -651,34 +719,6 @@ public class MainView extends JFrame {
     }
 
     private void loadFiscalizationsBySearch(String searchTerm) {
-
-        fiscalizationTableModel.setRowCount(0);
-
-        List<Fiscalization> fiscalizations =
-                fiscalizationService
-                        .search(searchTerm);
-
-        DateTimeFormatter formatter =
-                DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-
-        for (Fiscalization fiscalization : fiscalizations) {
-
-            fiscalizationTableModel.addRow(
-                    new Object[]{
-                            fiscalization.getId(),
-                            fiscalization.getUser().getName(),
-                            fiscalization.getGasPump()
-                                    .getGasStation()
-                                    .getCorporateName(),
-                            fiscalization.getGasPump()
-                                    .getSerialNumber(),
-                            fiscalization.getIrregularityType(),
-                            fiscalization.getAuditStatus(),
-                            fiscalization.getMeasurementError(),
-                            fiscalization.getFiscalizationDate()
-                                    .format(formatter)
-                    }
-            );
-        }
+        loadFiscalizations(searchTerm);
     }
 }
