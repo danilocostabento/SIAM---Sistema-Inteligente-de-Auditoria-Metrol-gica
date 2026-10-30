@@ -13,12 +13,12 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public void save(User user) {
-        String sql = "INSERT INTO user (name, login, registration, password_hash, user_type) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO app_user (name, login, registration, password_hash, user_type) VALUES (?, ?, ?, ?, ?)";
 
         try (
                 Connection connection = DatabaseConnection.getConnection();
                 PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
-                ) {
+        ) {
             statement.setString(1, user.getName());
             statement.setString(2, user.getLogin());
             statement.setString(3, user.getRegistration());
@@ -43,12 +43,12 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public Optional<User> findById(Integer id) {
-        String sql = "SELECT id, name, login, registration, password_hash, user_type, active FROM user WHERE id = ?";
+        String sql = "SELECT id, name, login, registration, password_hash, user_type, active FROM app_user WHERE id = ?";
 
         try (
                 Connection connection = DatabaseConnection.getConnection();
                 PreparedStatement statement = connection.prepareStatement(sql)
-                ) {
+        ) {
             statement.setInt(1, id);
 
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -65,12 +65,12 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public Optional<User> findByEmailOrRegistration(String identifier) {
-        String sql = "SELECT id, name, login, registration, password_hash, user_type, active FROM user WHERE login = ? OR registration = ?";
+        String sql = "SELECT id, name, login, registration, password_hash, user_type, active FROM app_user WHERE login = ? OR registration = ?";
 
         try (
                 Connection connection = DatabaseConnection.getConnection();
                 PreparedStatement statement = connection.prepareStatement(sql)
-                ) {
+        ) {
             statement.setString(1, identifier);
             statement.setString(2, identifier);
 
@@ -88,14 +88,14 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public List<User> findAll() {
-        String sql = "SELECT id, name, login, registration, password_hash, user_type, active FROM user";
+        String sql = "SELECT id, name, login, registration, password_hash, user_type, active FROM app_user";
         List<User> users = new ArrayList<>();
 
         try (
                 Connection connection = DatabaseConnection.getConnection();
                 PreparedStatement statement = connection.prepareStatement(sql);
                 ResultSet resultSet = statement.executeQuery()
-                ) {
+        ) {
             while (resultSet.next()) {
                 users.add(mapResultSetToUser(resultSet));
             }
@@ -111,12 +111,12 @@ public class UserDAOImpl implements UserDAO {
             String name,
             String passwordHash
     ) {
-        String sql = "UPDATE user SET name = ?, password_hash = ? WHERE id = ?";
+        String sql = "UPDATE app_user SET name = ?, password_hash = ? WHERE id = ?";
 
         try (
                 Connection connection = DatabaseConnection.getConnection();
                 PreparedStatement statement = connection.prepareStatement(sql)
-                ) {
+        ) {
             statement.setString(1, name);
             statement.setString(2, passwordHash);
             statement.setInt(3, userId);
@@ -130,23 +130,7 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public void deactivate(Integer id) {
-        String sql = "UPDATE user SET active = false WHERE id = ?";
-
-        try (
-                Connection connection = DatabaseConnection.getConnection();
-                PreparedStatement statement = connection.prepareStatement(sql)
-                ) {
-            statement.setInt(1, id);
-            statement.executeUpdate();
-
-        } catch (SQLException exception) {
-            throw new RuntimeException("Erro deleting user.", exception);
-        }
-    }
-
-    @Override
-    public void reactivate(Integer id) {
-        String sql = "UPDATE user SET active = true WHERE id = ?";
+        String sql = "UPDATE app_user SET active = false WHERE id = ?";
 
         try (
                 Connection connection = DatabaseConnection.getConnection();
@@ -156,7 +140,23 @@ public class UserDAOImpl implements UserDAO {
             statement.executeUpdate();
 
         } catch (SQLException exception) {
-            throw new RuntimeException("Erro reativating user.", exception);
+            throw new RuntimeException("Error deactivating user.", exception);
+        }
+    }
+
+    @Override
+    public void reactivate(Integer id) {
+        String sql = "UPDATE app_user SET active = true WHERE id = ?";
+
+        try (
+                Connection connection = DatabaseConnection.getConnection();
+                PreparedStatement statement = connection.prepareStatement(sql)
+        ) {
+            statement.setInt(1, id);
+            statement.executeUpdate();
+
+        } catch (SQLException exception) {
+            throw new RuntimeException("Error reactivating user.", exception);
         }
     }
 
